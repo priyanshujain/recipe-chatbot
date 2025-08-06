@@ -108,16 +108,18 @@ def annotate(fname:str):
                     id="axial_coding_code", icon=True, insertable=True, multiple=False,
                     value=axial_code, placeholder="Select or add axial coding (failure mode)..."
                 ),
-                mui.TextArea(notes, name="notes", value=notes, rows=20),
+                mui.TextArea(notes, name="notes", value=notes, rows=20, autofocus=True),
+                ft.Input(name="next_fname", value=next_file, hidden=True),
                 mui.Button("Save", type="submit"),
                 action=save_annotation.to(fname=fname), method="post",
+                hx_on_keydown="if(event.ctrlKey && event.key === 'Enter') this.submit()",
                 cls='w-full flex flex-col gap-2'
             ),
         ),
     )
 
 @rt
-def save_annotation(fname:str, notes:str, axial_coding_code:str=None):
+def save_annotation(fname:str, notes:str, axial_coding_code:str=None, next_fname:str=None):
     path = os.path.join(DATASET_DIR, fname)
     with open(path) as f:
         data = json.load(f)
@@ -126,7 +128,7 @@ def save_annotation(fname:str, notes:str, axial_coding_code:str=None):
         data["axial_coding_code"] = axial_coding_code
     with open(path, "w") as f:
         json.dump(data, f)
-    return ft.Redirect(annotate.to(fname=fname))
+    return ft.Redirect(annotate.to(fname=next_fname))
 
 @rt
 def theme():
